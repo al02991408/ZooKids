@@ -50,7 +50,6 @@ struct ShopView: View {
                 //         }
                 //     }
                 // }
-            }
             .listStyle(.plain) // Estilo de lista moderna (sin bordes)
         }
         .navigationTitle("Tienda")

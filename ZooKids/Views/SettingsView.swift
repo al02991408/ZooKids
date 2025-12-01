@@ -131,5 +131,4 @@ struct SettingsView_Previews: PreviewProvider {
             SettingsView()
                 .environmentObject(testGameData)
         }
-    }
 }
