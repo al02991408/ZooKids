@@ -41,8 +41,11 @@ final class WordJungleViewModel: ObservableObject {
     @Published var feedbackMessage: String = ""
     @Published var isAnswered: Bool = false
     @Published var isCorrect: Bool? = nil
-
-    init() {
+    
+    var gameData: GameData?
+    
+    init(gameData: GameData? = nil) {
+        self.gameData = gameData
         loadNewRound()
     }
     
@@ -81,6 +84,9 @@ final class WordJungleViewModel: ObservableObject {
             feedbackMessage = "¡Excelente! Has identificado el sonido de la '\(targetLetter)' 🎉"
             isCorrect = true
             // Lógica de recompensa: gameData.addCoins(10)
+            gameData?.addXP(10)
+            gameData?.coins += 2
+            HapticManager.shared.playSuccess()
             
             // Cargar la siguiente ronda después de un breve retraso
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {

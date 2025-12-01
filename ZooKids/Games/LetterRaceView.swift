@@ -11,12 +11,17 @@ import SwiftUI
 
 struct LetterRaceView: View {
     let game: Game // Para el título del juego
+    @EnvironmentObject var gameData: GameData
     
     @StateObject private var viewModel = LetterRaceViewModel()
     
     // Estado para la posición de la flecha guía
     @State private var arrowPosition: CGPoint = .zero
     @State private var arrowRotation: Angle = .zero
+    
+    // Estados para AR y Feedback
+    @State private var showAR = false
+    @State private var showFeedback = false
     
     var body: some View {
         ZStack {
@@ -33,8 +38,23 @@ struct LetterRaceView: View {
                         .font(.largeTitle)
                         .fontWeight(.bold)
                         .foregroundColor(.primary)
+                    
+                    Spacer()
+                    
+                    // Botón AR
+                    Button(action: { showAR = true }) {
+                        HStack {
+                            Image(systemName: "arkit")
+                            Text("Ver en AR")
+                        }
+                        .padding(8)
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                    }
                 }
                 .padding(.top, 20)
+                .padding(.horizontal)
                 
                 // 2. Instrucción
                 Text("Traza la letra")
@@ -166,9 +186,30 @@ struct LetterRaceView: View {
                 
                 Spacer()
             }
+            
+            // Popups
+            MotivationalFeedbackView(message: "¡Letra Completada!", isPresented: $showFeedback)
         }
         .navigationTitle(game.title)
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $showAR) {
+            VStack {
+                HStack {
+                    Spacer()
+                    Button("Cerrar") { showAR = false }
+                        .padding()
+                }
+                ARLetterView(letter: viewModel.currentLetter)
+            }
+        }
+        .onAppear {
+            viewModel.gameData = gameData
+        }
+        .onChange(of: viewModel.isLetterCompleted) { completed in
+            if completed {
+                showFeedback = true
+            }
+        }
     }
 }
 

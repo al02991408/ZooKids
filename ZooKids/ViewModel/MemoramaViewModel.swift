@@ -26,7 +26,10 @@ final class MemoramaViewModel: ObservableObject {
         }
     }
     
-    init(theme: MemoramaTheme = .animals) {
+    var gameData: GameData?
+    
+    init(theme: MemoramaTheme = .animals, gameData: GameData? = nil) {
+        self.gameData = gameData
         setupGame(with: theme)
     }
     
@@ -71,6 +74,9 @@ final class MemoramaViewModel: ObservableObject {
                 
                 if matchesFound == 6 { // La condición final para 12 cartas
                     feedbackMessage = "¡Felicidades! Ganaste en \(movesCount) movimientos! 🏆"
+                    gameData?.addXP(50)
+                    gameData?.coins += 15
+                    HapticManager.shared.playSuccess()
                 }
                 
                 // Limpiar índice ya que ambas están emparejadas/volteadas

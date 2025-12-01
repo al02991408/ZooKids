@@ -10,6 +10,7 @@ import SwiftUI
 struct SettingsView: View {
     // Necesario para acceder a la mascota actual y a la lógica de cerrar sesión
     @EnvironmentObject var gameData: GameData
+    @StateObject private var viewModel = SettingsViewModel()
     
     var body: some View {
         List {
@@ -37,23 +38,54 @@ struct SettingsView: View {
                 }
             }
             
-            // Sección 2: Opciones de la Aplicación
-            Section(header: Text("Preferencias de la App").font(.headline)) {
-                
-                // Opción para controlar sonidos (usando un @State simple por ahora)
-                Toggle(isOn: .constant(true)) {
-                    Label("Efectos de Sonido", systemImage: "speaker.wave.3.fill")
+            // Sección 2: Accesibilidad
+            Section(header: Text("Accesibilidad").font(.headline)) {
+                Toggle(isOn: $viewModel.isVoiceOverEnabled) {
+                    Label("VoiceOver", systemImage: "accessibility")
                 }
-                .tint(.green)
                 
-                // Opción para controlar música
-                Toggle(isOn: .constant(false)) {
-                    Label("Música de Fondo", systemImage: "music.note")
+                Toggle(isOn: $viewModel.isHighContrastEnabled) {
+                    Label("Alto Contraste", systemImage: "circle.lefthalf.filled")
                 }
-                .tint(.green)
+                
+                VStack(alignment: .leading) {
+                    Text("Tamaño de Texto: \(String(format: "%.1f", viewModel.textSize))x")
+                    Slider(value: $viewModel.textSize, in: 0.8...1.5, step: 0.1)
+                }
             }
             
-            // Sección 3: Acciones (Cerrar Sesión / Cambiar Mascota)
+            // Sección 3: Sensorial
+            Section(header: Text("Sensorial").font(.headline)) {
+                Toggle(isOn: $viewModel.isHapticsEnabled) {
+                    Label("Vibración (Haptics)", systemImage: "iphone.radiowaves.left.and.right")
+                }
+                
+                VStack(alignment: .leading) {
+                    Text("Volumen de Sonido")
+                    Slider(value: $viewModel.soundVolume, in: 0...1)
+                }
+                
+                VStack(alignment: .leading) {
+                    Text("Volumen de Música")
+                    Slider(value: $viewModel.musicVolume, in: 0...1)
+                }
+            }
+            
+            // Sección 4: Portal de Padres
+            Section {
+                NavigationLink(destination: ParentPortalView(viewModel: viewModel)) {
+                    Label("Portal de Padres / Tutor", systemImage: "person.2.fill")
+                }
+            }
+            
+            // Sección 5: Acerca de
+            Section(header: Text("Acerca de").font(.headline)) {
+                NavigationLink(destination: AboutView()) {
+                    Label("Información de la App", systemImage: "info.circle")
+                }
+            }
+            
+            // Sección 6: Acciones (Cerrar Sesión / Cambiar Mascota)
             Section {
                 // El botón que ejecuta la acción para volver a la pantalla inicial
                 Button {
@@ -67,6 +99,26 @@ struct SettingsView: View {
         }
         .listStyle(.insetGrouped) // Estilo de lista agrupada para mejor jerarquía visual
         .navigationTitle("Ajustes")
+    }
+}
+
+// Vista simple para "Acerca de"
+struct AboutView: View {
+    var body: some View {
+        List {
+            Section(header: Text("Versión")) {
+                Text("ZooKids v1.0.0")
+            }
+            Section(header: Text("Equipo")) {
+                Text("Desarrollado por el equipo de ZooKids")
+            }
+            Section(header: Text("Legal")) {
+                Link("Política de Privacidad", destination: URL(string: "https://example.com/privacy")!)
+            }
+        }
+        .navigationTitle("Acerca de")
+    }
+
     }
 }
 

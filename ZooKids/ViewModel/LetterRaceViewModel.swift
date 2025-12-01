@@ -39,7 +39,11 @@ final class LetterRaceViewModel: ObservableObject {
         return currentLetterIndex < alphabet.count - 1
     }
     
-    init() {
+    // Referencia a GameData para recompensas
+    var gameData: GameData?
+    
+    init(gameData: GameData? = nil) {
+        self.gameData = gameData
         loadNewLetter()
     }
     
@@ -132,6 +136,12 @@ final class LetterRaceViewModel: ObservableObject {
             if completionPercentage >= Double(completionThreshold) {
                 isLetterCompleted = true
                 feedbackMessage = "¡Letra \(currentLetter) completada!"
+                
+                // RECOMPENSA
+                gameData?.addXP(20)
+                gameData?.coins += 5
+                HapticManager.shared.playSuccess()
+                
                 currentLetterIndex += 1
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                     self.loadNewLetter()

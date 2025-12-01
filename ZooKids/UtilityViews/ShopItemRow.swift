@@ -12,8 +12,11 @@ struct ShopItemRow: View {
     let item: ShopItem
     @EnvironmentObject var gameData: GameData
     
+    var isOwned: Bool {
+        return gameData.unlockedItemIds.contains(item.id) && item.category != "Consumibles"
+    }
+    
     var canAfford: Bool {
-        // Asumiendo que gameData tiene una propiedad 'coins'
         return gameData.coins >= item.price
     }
     
@@ -46,25 +49,32 @@ struct ShopItemRow: View {
             
             // 3. Botón de Compra con Precio
             Button(action: {
-                // Lógica de compra: restar monedas y añadir ítem al inventario
-                if canAfford {
+                if !isOwned && canAfford {
+                    gameData.buyItem(item)
+                } else if item.category == "Consumibles" && canAfford {
                     gameData.buyItem(item)
                 }
             }) {
                 HStack {
-                    Image(systemName: "yensign.circle.fill") // SFSymbol para moneda
-                    Text("\(item.price)")
+                    if isOwned {
+                        Image(systemName: "checkmark.circle.fill")
+                        Text("Comprado")
+                    } else {
+                        Image(systemName: "yensign.circle.fill")
+                        Text("\(item.price)")
+                    }
                 }
                 .font(.headline)
                 .fontWeight(.bold)
                 .padding(.horizontal, 15)
                 .padding(.vertical, 8)
-                .background(canAfford ? Color.green : Color.gray) // Color condicional
+                .background(isOwned ? Color.gray : (canAfford ? Color.green : Color.gray))
                 .foregroundColor(.white)
                 .cornerRadius(10)
             }
-            // Deshabilitar botón si no se puede pagar
-            .disabled(!canAfford)
+            .disabled(isOwned || (!canAfford && !isOwned))
+            .accessibilityLabel(isOwned ? "Comprado" : "Comprar por \(item.price) monedas")
+            .accessibilityHint(isOwned ? "Ya tienes este artículo" : (canAfford ? "Toca para comprar" : "No tienes suficientes monedas"))
         }
         .padding(.vertical, 8)
     }

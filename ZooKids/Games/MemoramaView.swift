@@ -10,8 +10,10 @@ import SwiftUI
 // VISTA PRINCIPAL DEL JUEGO
 struct MemoramaView: View {
     let game: Game
+    @EnvironmentObject var gameData: GameData
     
     @StateObject private var viewModel = MemoramaViewModel()
+    @State private var showFeedback = false
     
     // 4 columnas para un mejor ajuste de 12 cartas (4x3 = 12 cartas)
     private let columns: [GridItem] = Array(repeating: .init(.flexible()), count: 4)
@@ -77,9 +79,20 @@ struct MemoramaView: View {
             .padding(.top, 20)
             
             Spacer()
+            
+            MotivationalFeedbackView(message: "¡Ganaste!", isPresented: $showFeedback)
         }
         .navigationTitle(game.title)
-        .navigationBarTitleDisplayMode(.inline)    }
+        .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            viewModel.gameData = gameData
+        }
+        .onChange(of: viewModel.matchesFound) { matches in
+            if matches == 6 {
+                showFeedback = true
+            }
+        }
+    }
 }
 
 // Previsualización

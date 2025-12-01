@@ -10,7 +10,9 @@ import SwiftUI
 struct WordJungleView: View {
     let game: Game
     
+    @EnvironmentObject var gameData: GameData
     @StateObject private var viewModel = WordJungleViewModel()
+    @State private var showFeedback = false
     
     var body: some View {
         ZStack {
@@ -72,9 +74,19 @@ struct WordJungleView: View {
                 
                 Spacer()
             }
+            
+            MotivationalFeedbackView(message: "¡Correcto!", isPresented: $showFeedback)
         }
         .navigationTitle(game.title)
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            viewModel.gameData = gameData
+        }
+        .onChange(of: viewModel.isCorrect) { correct in
+            if correct == true {
+                showFeedback = true
+            }
+        }
     }
 }
 

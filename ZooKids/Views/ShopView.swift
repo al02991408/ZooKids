@@ -29,6 +29,8 @@ struct ShopView: View {
                         .font(.title)
                         .fontWeight(.heavy)
                 }
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("Saldo actual: \(gameData.coins) monedas")
             }
             .padding(.horizontal)
             .padding(.vertical, 10)
@@ -36,11 +38,10 @@ struct ShopView: View {
             
             // 2. Lista de Artículos de la Tienda
             List {
-                // Agrupar por categorías (opcional, pero mejora la UI)
-                ForEach(ShopItem.items, id: \.category) { item in
+                ForEach(ShopItem.items) { item in
                     ShopItemRow(item: item)
-                        .environmentObject(gameData) // Asegura que se pasa el EnvironmentObject
                 }
+            }
                 // Si quieres secciones por categoría:
                 // ForEach(Array(Set(ShopItem.items.map { $0.category })), id: \.self) { category in
                 //     Section(header: Text(category)) {
